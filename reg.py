@@ -3,28 +3,7 @@ import os, sys, json
 class Registry():
 
     def __init__(self):
-        self.reg = {
-            "HKEY_CLASSES_ROOT": {
-                "Keys": {},
-                "Values": []
-                },
-            "HKEY_CURRENT_USER": {
-                "Keys": {},
-                "Values": []
-                },
-            "HKEY_LOCAL_MACHINE": {
-                "Keys": {},
-                "Values": []
-                },
-            "HKEY_USERS": {
-                "Keys": {},
-                "Values": []
-                },
-            "HKEY_CURRENT_CONFIG": {
-                "Keys": {},
-                "Values": []
-                }
-        }
+        self.reg = {}
     
     def read_from_reg(self, reg_file_path):
         # suppose the input file using utf-16 because it's default encoding of regedit exported file
@@ -41,6 +20,11 @@ class Registry():
             if reg_str.startswith('['):
                 reg_str = reg_str[1:-1]
                 reg_root = reg_str.split('\\')[0]
+                if reg_root not in self.reg:
+                    self.reg[reg_root] = {
+                        "Keys": {},
+                        "Values": []
+                        }
                 cur_dict = self.reg[reg_root]
                 for reg_key in reg_str.split('\\')[1:]:
                     if reg_key not in cur_dict['Keys'].keys():
@@ -76,11 +60,11 @@ class Registry():
                         "Data": value_data
                     }
                 )
-    
+
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
-
+    
 if __name__=="__main__":
     reg = Registry()
     reg.read_from_reg(sys.argv[1])
