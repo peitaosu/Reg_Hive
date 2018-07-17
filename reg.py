@@ -64,8 +64,39 @@ class Registry():
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
-    
+
+    def dump_to_reg(self, reg_file_path):
+        reg_str_list = []
+        reg_str_list.append('Windows Registry Editor Version 5.00')
+
+        def parse_key(parent_key, parent_str):
+            if len(parent_key['Values']) != 0:
+                reg_str_list.append('\n[{}]'.format(parent_str))
+            for value in parent_key['Values']:
+                name = value['Name']
+                if name is '(Default)':
+                    name = '@'
+                if value['Type'] is "REG_SZ":
+                    reg_str_list.append('"{}"="{}"'.format(name, value['Data']))
+                elif value['Type'] is "REG_DWORD":
+                    reg_str_list.append('"{}"=dword:{}'.format(name, value['Data']))
+                elif value['Type'] is "REG_QWORD":
+                    reg_str_list.append('"{}"=qword:{}'.format(name, value['Data']))
+                elif value['Type'] is "REG_BINARY":
+                    reg_str_list.append('"{}"=hex:{}'.format(name, value['Data']))
+            for key in parent_key['Keys']:
+                parse_key(parent_key['Keys'][key], parent_str + '\\' + key)
+
+        for root in self.reg:
+            key_path = root
+            cur_key = self.reg[root]
+            parse_key(cur_key, key_path)
+                    
+        with open(reg_file_path, 'w') as reg_file:
+            reg_file.write('\n'.join(reg_str_list))
+
 if __name__=="__main__":
     reg = Registry()
     reg.read_from_reg(sys.argv[1])
     reg.dump_to_json(sys.argv[2])
+    reg.dump_to_reg(sys.argv[3])
