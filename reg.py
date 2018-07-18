@@ -123,7 +123,7 @@ class Registry():
             reg_file.write('\n'.join(redirected_reg_str))
         os.system('regedit /s {}'.format(temp_reg_file))
         os.system('reg save {} {} /y'.format(dat_key, dat_file_path))
-        os.system('reg delete {}'.format(dat_key))
+        os.system('reg delete {} /f'.format(dat_key))
 
 if __name__=="__main__":
     reg = Registry()
