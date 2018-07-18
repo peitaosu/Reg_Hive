@@ -4,17 +4,18 @@ class Registry():
 
     def __init__(self):
         self.reg = {}
+        self.reg_str = []
     
     def read_from_reg(self, reg_file_path):
         # suppose the input file using utf-16 because it's default encoding of regedit exported file
         try:
             with open(reg_file_path) as reg_file:    
-                reg_str_list = reg_file.read().decode('utf-16').replace('\\\r\n  ', '').split('\r\n')
+                self.reg_str = reg_file.read().decode('utf-16').replace('\\\r\n  ', '').split('\r\n')
         except:
             with open(reg_file_path, encoding='utf-16') as reg_file:
-                reg_str_list = reg_file.read().replace('\\\r\n  ', '').split('\r\n')
-        reg_str_list = filter(None, reg_str_list)
-        for reg_str in reg_str_list:
+                self.reg_str = reg_file.read().replace('\\\r\n  ', '').split('\r\n')
+        self.reg_str = filter(None, self.reg_str)
+        for reg_str in self.reg_str:
             if reg_str == 'Windows Registry Editor Version 5.00':
                 continue
             if reg_str.startswith('['):
@@ -65,25 +66,25 @@ class Registry():
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
 
-    def dump_to_reg(self, reg_file_path):
-        reg_str_list = []
-        reg_str_list.append('Windows Registry Editor Version 5.00')
+    def dump_to_reg(self, reg_file_path=None):
+        self.reg_str = []
+        self.reg_str.append('Windows Registry Editor Version 5.00')
 
         def parse_key(parent_key, parent_str):
             if len(parent_key['Values']) != 0:
-                reg_str_list.append('\n[{}]'.format(parent_str))
+                self.reg_str.append('\n[{}]'.format(parent_str))
             for value in parent_key['Values']:
                 name = value['Name']
                 if name is '(Default)':
                     name = '@'
                 if value['Type'] is "REG_SZ":
-                    reg_str_list.append('"{}"="{}"'.format(name, value['Data']))
+                    self.reg_str.append('"{}"="{}"'.format(name, value['Data']))
                 elif value['Type'] is "REG_DWORD":
-                    reg_str_list.append('"{}"=dword:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=dword:{}'.format(name, value['Data']))
                 elif value['Type'] is "REG_QWORD":
-                    reg_str_list.append('"{}"=qword:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=qword:{}'.format(name, value['Data']))
                 elif value['Type'] is "REG_BINARY":
-                    reg_str_list.append('"{}"=hex:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=hex:{}'.format(name, value['Data']))
             for key in parent_key['Keys']:
                 parse_key(parent_key['Keys'][key], parent_str + '\\' + key)
 
@@ -91,9 +92,10 @@ class Registry():
             key_path = root
             cur_key = self.reg[root]
             parse_key(cur_key, key_path)
-                    
-        with open(reg_file_path, 'w') as reg_file:
-            reg_file.write('\n'.join(reg_str_list))
+
+        if reg_file_path is not None:  
+            with open(reg_file_path, 'w') as reg_file:
+                reg_file.write('\n'.join(self.reg_str))
 
 if __name__=="__main__":
     reg = Registry()
