@@ -121,7 +121,7 @@ class Registry():
         temp_reg_file = uuid_str + '.reg'
         with open(temp_reg_file, 'w') as reg_file:
             reg_file.write('\n'.join(redirected_reg_str))
-        os.system('regedit /s {}'.format(temp_reg_file))
+        os.system('reg import {}'.format(temp_reg_file))
         os.system('reg save {} {} /y'.format(dat_key, dat_file_path))
         os.system('reg delete {} /f'.format(dat_key))
 
