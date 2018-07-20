@@ -62,6 +62,10 @@ class Registry():
                     }
                 )
 
+    def read_from_json(self, json_file_path):
+        with open(json_file_path) as json_file:
+            self.reg = json.load(json_file)
+
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
