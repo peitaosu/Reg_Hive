@@ -1,4 +1,4 @@
-import os, sys, json, uuid
+import os, sys, json, uuid, optparse
 
 class Registry():
 
@@ -129,9 +129,38 @@ class Registry():
         os.system('reg save {} {} /y'.format(dat_key, dat_file_path))
         os.system('reg delete {} /f'.format(dat_key))
 
+def get_options():
+    parser = optparse.OptionParser()
+    parser.add_option("--in_reg", dest="in_reg",
+                      help="read from reg file")
+    parser.add_option("--in_json", dest="in_json",
+                      help="read from json file")
+    parser.add_option("--out_reg", dest="out_reg",
+                      help="dump to reg file")
+    parser.add_option("--out_json", dest="out_json",
+                      help="dump to json file")
+    parser.add_option("--out_dat", dest="out_dat",
+                      help="dump to dat file")
+    parser.add_option("--hive_key", dest="hive_key",
+                      help="hive key save to dat")
+    (options, args) = parser.parse_args()
+    return options
+
 if __name__=="__main__":
+    opt = get_options()
+
     reg = Registry()
-    reg.read_from_reg(sys.argv[1])
-    reg.dump_to_json(sys.argv[2])
-    reg.dump_to_reg(sys.argv[3])
-    reg.dump_to_dat(sys.argv[4], sys.argv[5])
+    if opt.in_reg:
+        reg.read_from_reg(opt.in_reg)
+    if opt.in_json:
+        reg.read_from_json(opt.in_json)
+    
+    if opt.out_reg:
+        reg.dump_to_reg(opt.out_reg)
+    if opt.out_json:
+        reg.dump_to_json(opt.out_json)
+    if opt.out_dat:
+        if opt.hive_key:
+            reg.dump_to_dat(opt.out_dat, opt.hive_key)
+        else:
+            reg.dump_to_dat(opt.out_dat, None)
