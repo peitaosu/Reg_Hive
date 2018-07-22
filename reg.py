@@ -5,18 +5,20 @@ class Registry():
     def __init__(self):
         self.reg = {}
         self.reg_str = []
+        # suppose the input file using utf-16 because it's default encoding of regedit exported file
+        self.reg_file_encode = 'utf-16'
+        self.regedit_ver = 'Windows Registry Editor Version 5.00'
     
     def read_from_reg(self, reg_file_path):
-        # suppose the input file using utf-16 because it's default encoding of regedit exported file
         try:
             with open(reg_file_path) as reg_file:    
-                self.reg_str = reg_file.read().decode('utf-16').replace('\\\r\n  ', '').split('\r\n')
+                self.reg_str = reg_file.read().decode(self.reg_file_encode).replace('\\\r\n  ', '').split('\r\n')
         except:
-            with open(reg_file_path, encoding='utf-16') as reg_file:
+            with open(reg_file_path, encoding=self.reg_file_encode) as reg_file:
                 self.reg_str = reg_file.read().replace('\\\r\n  ', '').split('\r\n')
         self.reg_str = filter(None, self.reg_str)
         for reg_str in self.reg_str:
-            if reg_str == 'Windows Registry Editor Version 5.00':
+            if reg_str == self.regedit_ver:
                 continue
             if reg_str.startswith('['):
                 reg_str = reg_str[1:-1]
@@ -39,8 +41,6 @@ class Registry():
                 cur_key = cur_dict
             else:
                 value_name = reg_str.split('=')[0].strip('"')
-                if value_name == '@':
-                    value_name = '(Default)'
                 value_content = '='.join(reg_str.split('=')[1:])
                 if value_content.startswith('"'):
                     value_type = "REG_SZ"
@@ -72,23 +72,20 @@ class Registry():
 
     def dump_to_reg(self, reg_file_path=None):
         self.reg_str = []
-        self.reg_str.append('Windows Registry Editor Version 5.00')
+        self.reg_str.append(self.regedit_ver)
 
         def parse_key(parent_key, parent_str):
             if len(parent_key['Values']) != 0:
                 self.reg_str.append('\n[{}]'.format(parent_str))
             for value in parent_key['Values']:
-                name = value['Name']
-                if name is '(Default)':
-                    name = '@'
                 if value['Type'] is "REG_SZ":
-                    self.reg_str.append('"{}"="{}"'.format(name, value['Data']))
+                    self.reg_str.append('"{}"="{}"'.format(value['Name'], value['Data']))
                 elif value['Type'] is "REG_DWORD":
-                    self.reg_str.append('"{}"=dword:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=dword:{}'.format(value['Name'], value['Data']))
                 elif value['Type'] is "REG_QWORD":
-                    self.reg_str.append('"{}"=qword:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=qword:{}'.format(value['Name'], value['Data']))
                 elif value['Type'] is "REG_BINARY":
-                    self.reg_str.append('"{}"=hex:{}'.format(name, value['Data']))
+                    self.reg_str.append('"{}"=hex:{}'.format(value['Name'], value['Data']))
             for key in parent_key['Keys']:
                 parse_key(parent_key['Keys'][key], parent_str + '\\' + key)
 
@@ -108,7 +105,7 @@ class Registry():
         uuid_str = str(uuid.uuid4())
         dat_key = reg_root + '\\SOFTWARE\\' + uuid_str
         redirected_reg_str = []
-        redirected_reg_str.append('Windows Registry Editor Version 5.00')
+        redirected_reg_str.append(self.regedit_ver)
         started = False
         ended = False
         for iter in range(len(self.reg_str[1:])):
