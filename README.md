@@ -13,6 +13,7 @@ Options:
   -h, --help           show this help message and exit
   --in_reg=IN_REG      read from reg file
   --in_json=IN_JSON    read from json file
+  --in_dat=IN_DAT      read from dat file
   --out_reg=OUT_REG    dump to reg file
   --out_json=OUT_JSON  dump to json file
   --out_dat=OUT_DAT    dump to dat file
