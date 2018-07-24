@@ -66,6 +66,15 @@ class Registry():
         with open(json_file_path) as json_file:
             self.reg = json.load(json_file)
 
+    def read_from_dat(self, dat_file_path):
+        uuid_str = str(uuid.uuid4())
+        dat_key = 'HKLM\\' + uuid_str
+        reg_file = uuid_str + ".reg"
+        os.system('reg load {} {}'.format(dat_key, dat_file_path))
+        os.system('reg export {} {}'.format(dat_key, reg_file))
+        self.read_from_reg(reg_file)
+        os.system('reg unload {}'.format(dat_key))
+
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
