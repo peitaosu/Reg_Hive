@@ -1,7 +1,11 @@
 Registry Tool
 ===========
 
+[![GitHub license](https://img.shields.io/github/license/peitaosu/Reg_Hive.svg)](https://github.com/peitaosu/Reg_Hive/blob/master/LICENSE)
+
 Registry tool which support registry format conversion.
+
+To use dat format file it request administrator permission to execute reg command.
 
 ## Usage
 ```
