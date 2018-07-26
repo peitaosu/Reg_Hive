@@ -9,6 +9,18 @@ class Registry():
         self.reg_file_encode = 'utf-16'
         self.regedit_ver = 'Windows Registry Editor Version 5.00'
     
+    def set_reg_file_encode(self, reg_file_encode):
+        self.reg_file_encode = reg_file_encode
+    
+    def set_regedit_ver(self, regedit_ver):
+        self.regedit_ver = regedit_ver
+    
+    def set_reg(self, reg):
+        self.reg = reg
+
+    def get_reg(self):
+        return self.reg
+    
     def read_from_reg(self, reg_file_path):
         try:
             with open(reg_file_path) as reg_file:    
