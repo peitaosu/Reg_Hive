@@ -119,26 +119,30 @@ class Registry():
             with open(reg_file_path, 'w') as reg_file:
                 reg_file.write('\n'.join(self.reg_str))
 
-    def dump_to_dat(self, dat_file_path, dump_path):
+    def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
         if len(self.reg_str) == 0:
             self.dump_to_reg()
         reg_root = dump_path.split('\\')[0]
         uuid_str = str(uuid.uuid4())
         dat_key = reg_root + '\\SOFTWARE\\' + uuid_str
+        if redirect_path == None:
+            redirect_path = dat_key
+        else:
+            redirect_path = dat_key + '\\' + redirect_path
         redirected_reg_str = []
         redirected_reg_str.append(self.regedit_ver)
         started = False
         ended = False
         for iter in range(len(self.reg_str[1:])):
-            if self.reg_str[1:][iter].startswith('\n[' + dump_path) and started == False:
+            if self.reg_str[1:][iter].startswith('[' + dump_path) and started == False:
                 started = iter
-            if self.reg_str[1:][iter].startswith('\n[') and not self.reg_str[1:][iter].startswith('\n[' + dump_path) and started != False:
+            if self.reg_str[1:][iter].startswith('[') and not self.reg_str[1:][iter].startswith('[' + dump_path) and started != False:
                 ended = iter
         if ended == False:
             matched_reg_str = self.reg_str[1:][started:]
         else:
             matched_reg_str = self.reg_str[1:][started:ended]
-        matched_reg_str = [x.replace(dump_path, dat_key) for x in matched_reg_str]
+        matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
         redirected_reg_str.extend(matched_reg_str)
         temp_reg_file = uuid_str + '.reg'
         with open(temp_reg_file, 'w') as reg_file:
@@ -163,6 +167,8 @@ def get_options():
                       help="dump to dat file")
     parser.add_option("--hive_key", dest="hive_key",
                       help="hive key save to dat")
+    parser.add_option("--redirect", dest="redirect",
+                      help="redirect dat key")
     (options, args) = parser.parse_args()
     return options
 
@@ -183,6 +189,9 @@ if __name__=="__main__":
         reg.dump_to_json(opt.out_json)
     if opt.out_dat:
         if opt.hive_key:
-            reg.dump_to_dat(opt.out_dat, opt.hive_key)
+            if opt.redirect:
+                reg.dump_to_dat(opt.out_dat, opt.hive_key, opt.redirect)
+            else:
+                reg.dump_to_dat(opt.out_dat, opt.hive_key, None)
         else:
             reg.dump_to_dat(opt.out_dat, None)
