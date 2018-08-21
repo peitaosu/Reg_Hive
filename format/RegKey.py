@@ -141,5 +141,12 @@ class RegKey(object):
 					prev_name = curr_name
 
 					yield subkey
+		
+	def subkey(self, name):
+		name = name.lower()
+		for curr_subkey in self.subkeys():
+			curr_name = curr_subkey.name().lower()
+			if name == curr_name:
+				return curr_subkey
 
 
