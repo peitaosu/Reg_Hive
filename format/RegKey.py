@@ -1,5 +1,7 @@
 from RegBlock import RegBlock
 from RegLeaf import *
+from RegValue import *
+from KeyValue import *
 
 class RegKey(object):
 
@@ -149,4 +151,34 @@ class RegKey(object):
 			if name == curr_name:
 				return curr_subkey
 
+
+	def values(self):
+		values_names = set()
+		values_count = self.values_count()
+		if values_count > 0:
+			list_offset = self.key_node.get_key_values_list_offset()
+			list_buf = self.get_cell(list_offset)
+
+			values_list = KeyValues(list_buf, values_count)
+
+			slack = values_list.get_slack()
+			self.effective_slack.add(slack)
+
+			for value_offset in values_list.elements():
+				buf = self.get_cell(value_offset)
+				curr_value = RegValue(self.registry_file, buf, self.naive)
+				curr_value.cell_relative_offset = value_offset
+
+				slack_list = curr_value.data_slack()
+				for curr_slack in slack_list:
+					self.effective_slack.add(curr_slack)
+
+				curr_name = curr_value.name().lower()
+				if curr_name not in values_names:
+					values_names.add(curr_name)
+
+				yield curr_value
+
+	def values_count(self):
+		return self.key_node.get_key_values_count()
 
