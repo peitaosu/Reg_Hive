@@ -48,3 +48,24 @@ class KeyValue(BaseBlock):
 
 	def get_slack(self):
 		return self.read_bin(20 + self.get_value_name_length())
+
+class KeyValues(BaseBlock):
+
+	def __init__(self, buf, elements_count):
+		super(KeyValues, self).__init__(buf)
+		self.elements_count = elements_count
+
+	def elements(self):
+		i = 0
+		while i < self.elements_count:
+			yield self.read_uint32(i * 4)
+			i += 1
+
+	def remnant_elements(self):
+		i = self.elements_count
+		while i < self.get_size() // 4:
+			yield self.read_uint32(i * 4)
+			i += 1
+
+	def get_slack(self):
+		return self.read_bin(self.elements_count * 4)
