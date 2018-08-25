@@ -181,4 +181,12 @@ class RegKey(object):
 
 	def values_count(self):
 		return self.key_node.get_key_values_count()
+	
+	def value(self, name = ''):
+		name = name.lower()
+		for curr_value in self.values():
+			curr_name = curr_value.name().lower()
+			if name == curr_name:
+				return curr_value
+
 
