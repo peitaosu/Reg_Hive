@@ -1,0 +1,6 @@
+# python
+*.pyc
+
+# registry
+*.reg
+*.dat
