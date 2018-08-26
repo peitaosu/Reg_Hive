@@ -19,6 +19,7 @@ class RegFile(BaseFile):
         self.clustering_factor = self.get_clustering_factor()
         self.filename = self.get_filename()
         self.checksum = self.get_checksum()
+        self.is_primary_file = self.get_file_type() == FILE_TYPE_PRIMARY
         self.boot_type = self.get_boot_type()
         self.boot_recover = self.get_boot_recover()
         self.rmid = self.get_rmid()
@@ -35,7 +36,6 @@ class RegFile(BaseFile):
         self.file_size = self.get_file_size()
 
         self.is_old_cell_format = self.get_minor_version() in MINOR_VERSION_NUMBERS_FOR_OLD_CELL_FORMAT
-        self.is_primary_file = self.get_file_type() == FILE_TYPE_PRIMARY
         self.is_baseblock_valid = self.validate_checksum()
         self.is_file_dirty = self.get_primary_sequence_number() != self.get_secondary_sequence_number()
 
