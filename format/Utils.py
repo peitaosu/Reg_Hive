@@ -1,3 +1,5 @@
+from datetime import *
+
 def DecodeASCII(Buffer):
 	return Buffer.decode('latin-1')
 
@@ -27,3 +29,6 @@ def DecodeUnicodeMulti(Buffer, RemoveGarbage = False):
 			pos += 2
 
 	return DecodeUnicode(Buffer)
+
+def DecodeFiletime(Timestamp):
+	return datetime(1601, 1, 1) + timedelta(microseconds = Timestamp / 10)
