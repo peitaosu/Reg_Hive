@@ -1,7 +1,9 @@
 from RegBlock import RegBlock
+from RegFile import RegFile
 from RegLeaf import *
 from RegValue import *
 from KeyValue import *
+from Utils import *
 
 class RegKey(object):
 
@@ -189,4 +191,36 @@ class RegKey(object):
 			if name == curr_name:
 				return curr_value
 
+class RegHive(object):
+	registry_file = None
+	log_entry_callback = None
+	effective_slack = None
 
+	def __init__(self, file_obj, tolerate_minor_errors = True):
+		self.registry_file = RegFile(file_obj)
+		self.tolerate_minor_errors = tolerate_minor_errors
+		self.effective_slack = set()
+
+	def root_key(self):
+		return RegKey(self.registry_file, self.registry_file.get_root_cell_offset(), 0, self.registry_file.get_root_cell_offset(), self.tolerate_minor_errors)
+
+	def last_written_timestamp(self):
+		return DecodeFiletime(self.registry_file.get_last_written_timestamp())
+
+	def last_reorganized_timestamp(self):
+		timestamp = self.registry_file.get_last_reorganized_timestamp()
+		if timestamp is not None:
+			return DecodeFiletime(timestamp)
+
+	def find_key(self, path):
+		if path == '\\' or len(path) == 0:
+			return self.root_key()
+		if path[0] == '\\':
+			path = path[1 : ]
+		current_key = self.root_key()
+		path_components = path.split('\\')
+		i = 0
+		while i < len(path_components) and current_key is not None:
+			current_key = current_key.subkey(path_components[i])
+			i += 1
+		return current_key
