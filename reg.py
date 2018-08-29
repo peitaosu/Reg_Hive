@@ -1,4 +1,4 @@
-import os, sys, json, uuid, optparse
+import os, sys, json, uuid, optparse, yarp
 
 class Registry():
 
@@ -8,6 +8,7 @@ class Registry():
         # suppose the input file using utf-16 because it's default encoding of regedit exported file
         self.reg_file_encode = 'utf-16'
         self.regedit_ver = 'Windows Registry Editor Version 5.00'
+        self.reg_hive = None
     
     def set_reg_file_encode(self, reg_file_encode):
         self.reg_file_encode = reg_file_encode
@@ -79,6 +80,8 @@ class Registry():
             self.reg = json.load(json_file)
 
     def read_from_dat(self, dat_file_path):
+        with open(dat_file_path, "rb") as in_file:
+            self.reg_hive = yarp.Registry.RegistryHive(in_file)
         uuid_str = str(uuid.uuid4())
         dat_key = 'HKLM\\' + uuid_str
         reg_file = uuid_str + ".reg"
