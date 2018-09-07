@@ -94,7 +94,7 @@ class Registry():
         with open(json_file_path, 'w') as json_file:
             json.dump(self.reg, json_file, indent=4)
 
-    def dump_to_reg(self, reg_file_path=None):
+    def dump_to_reg(self, reg_file_path=None, dump_path=None):
         self.reg_str = []
         self.reg_str.append(self.regedit_ver)
 
@@ -118,9 +118,26 @@ class Registry():
             cur_key = self.reg[root]
             parse_key(cur_key, key_path)
 
+        if dump_path is not None:
+            started = False
+            ended = False
+            for iter in range(len(self.reg_str[1:])):
+                if self.reg_str[1:][iter].startswith('\n[' + dump_path) and started == False:
+                    started = iter
+                if self.reg_str[1:][iter].startswith('\n[') and not self.reg_str[1:][iter].startswith('\n[' + dump_path) and started != False:
+                    ended = iter
+            if ended == False:
+                matched_reg_str = self.reg_str[1:][started:]
+            else:
+                matched_reg_str = self.reg_str[1:][started:ended]
+            matched_reg_str = [self.regedit_ver] + matched_reg_str
+            
         if reg_file_path is not None:  
             with open(reg_file_path, 'w') as reg_file:
-                reg_file.write('\n'.join(self.reg_str))
+                if dump_path is None:
+                    reg_file.write('\n'.join(self.reg_str))
+                else:
+                    reg_file.write('\n'.join(matched_reg_str))
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
         if len(self.reg_str) == 0:
