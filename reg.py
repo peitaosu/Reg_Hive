@@ -181,6 +181,8 @@ def get_options():
                       help="read from dat file")
     parser.add_option("--out_reg", dest="out_reg",
                       help="dump to reg file")
+    parser.add_option("--reg_key", dest="reg_key",
+                      help="reg key save to reg")
     parser.add_option("--out_json", dest="out_json",
                       help="dump to json file")
     parser.add_option("--out_dat", dest="out_dat",
@@ -204,7 +206,7 @@ if __name__=="__main__":
         reg.read_from_dat(opt.in_dat)
 
     if opt.out_reg:
-        reg.dump_to_reg(opt.out_reg)
+        reg.dump_to_reg(opt.out_reg, opt.reg_key)
     if opt.out_json:
         reg.dump_to_json(opt.out_json)
     if opt.out_dat:
