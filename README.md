@@ -21,6 +21,7 @@ Options:
   --out_reg=OUT_REG    dump to reg file
   --out_json=OUT_JSON  dump to json file
   --out_dat=OUT_DAT    dump to dat file
+  --reg_key=REG_KEY    reg key save to reg
   --hive_key=HIVE_KEY  hive key save to dat
 
 ```
