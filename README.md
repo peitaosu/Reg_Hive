@@ -7,6 +7,11 @@ Registry tool which support registry format conversion.
 
 To use dat format file it request administrator permission to execute reg command.
 
+## Supported Formats:
+* reg
+* dat
+* json
+
 ## Usage
 ```
 > python reg.py -h
