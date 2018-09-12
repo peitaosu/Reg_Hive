@@ -139,6 +139,7 @@ class Registry():
                 else:
                     if started == False:
                         print("{} PATH NOT FOUND.".format(dump_path))
+                        sys.exit()
                     reg_file.write('\n'.join(matched_reg_str))
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
