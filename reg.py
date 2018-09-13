@@ -117,7 +117,7 @@ class Registry():
             key_path = root
             cur_key = self.reg[root]
             parse_key(cur_key, key_path)
-
+        
         if dump_path is not None:
             started = False
             ended = False
@@ -137,7 +137,7 @@ class Registry():
                 if dump_path is None:
                     reg_file.write('\n'.join(self.reg_str))
                 else:
-                    if started == False:
+                    if started == False and started != 0:
                         print("{} PATH NOT FOUND.".format(dump_path))
                         sys.exit()
                     reg_file.write('\n'.join(matched_reg_str))
