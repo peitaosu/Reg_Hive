@@ -130,17 +130,19 @@ class Registry():
                 matched_reg_str = self.reg_str[1:][started:]
             else:
                 matched_reg_str = self.reg_str[1:][started:ended]
+            if started == False and started != 0:
+                print("{} PATH NOT FOUND.".format(dump_path))
+                return None
             matched_reg_str = [self.regedit_ver] + matched_reg_str
             
         if reg_file_path is not None:  
             with open(reg_file_path, 'w') as reg_file:
                 if dump_path is None:
                     reg_file.write('\n'.join(self.reg_str))
+                    return self.reg_str
                 else:
-                    if started == False and started != 0:
-                        print("{} PATH NOT FOUND.".format(dump_path))
-                        sys.exit()
                     reg_file.write('\n'.join(matched_reg_str))
+                    return matched_reg_str
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
         if len(self.reg_str) == 0:
@@ -165,6 +167,9 @@ class Registry():
             matched_reg_str = self.reg_str[1:][started:]
         else:
             matched_reg_str = self.reg_str[1:][started:ended]
+        if started == False and started != 0:
+            print("{} PATH NOT FOUND.".format(dump_path))
+            return None
         matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
         redirected_reg_str.extend(matched_reg_str)
         temp_reg_file = uuid_str + '.reg'
@@ -173,6 +178,7 @@ class Registry():
         os.system('reg import {}'.format(temp_reg_file))
         os.system('reg save {} {} /y'.format(dat_key, dat_file_path))
         os.system('reg delete {} /f'.format(dat_key))
+        return redirected_reg_str
 
 def get_options():
     parser = optparse.OptionParser()
