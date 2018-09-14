@@ -102,13 +102,13 @@ class Registry():
             if len(parent_key['Values']) != 0:
                 self.reg_str.append('\n[{}]'.format(parent_str))
             for value in parent_key['Values']:
-                if value['Type'] is "REG_SZ":
+                if value['Type'] == "REG_SZ":
                     self.reg_str.append('"{}"="{}"'.format(value['Name'], value['Data']))
-                elif value['Type'] is "REG_DWORD":
+                elif value['Type'] == "REG_DWORD":
                     self.reg_str.append('"{}"=dword:{}'.format(value['Name'], value['Data']))
-                elif value['Type'] is "REG_QWORD":
+                elif value['Type'] == "REG_QWORD":
                     self.reg_str.append('"{}"=qword:{}'.format(value['Name'], value['Data']))
-                elif value['Type'] is "REG_BINARY":
+                elif value['Type'] == "REG_BINARY":
                     self.reg_str.append('"{}"=hex:{}'.format(value['Name'], value['Data']))
             for key in parent_key['Keys']:
                 parse_key(parent_key['Keys'][key], parent_str + '\\' + key)
@@ -117,7 +117,7 @@ class Registry():
             key_path = root
             cur_key = self.reg[root]
             parse_key(cur_key, key_path)
-        
+
         if dump_path is not None:
             started = False
             ended = False
