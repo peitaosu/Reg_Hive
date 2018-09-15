@@ -1,4 +1,4 @@
-import os, sys, json, uuid, optparse, yarp
+import os, sys, json, uuid, optparse
 
 class Registry():
 
@@ -80,6 +80,7 @@ class Registry():
             self.reg = json.load(json_file)
 
     def read_from_dat(self, dat_file_path):
+        import yarp
         with open(dat_file_path, "rb") as in_file:
             self.reg_hive = yarp.Registry.RegistryHive(in_file)
         uuid_str = str(uuid.uuid4())
@@ -145,6 +146,7 @@ class Registry():
                     return matched_reg_str
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
+        import yarp
         if len(self.reg_str) == 0:
             self.dump_to_reg()
         reg_root = dump_path.split('\\')[0]
@@ -225,4 +227,4 @@ if __name__=="__main__":
             else:
                 reg.dump_to_dat(opt.out_dat, opt.hive_key, None)
         else:
-            reg.dump_to_dat(opt.out_dat, None)
+            print("Please specify --hive_key.")
