@@ -132,7 +132,7 @@ class Registry():
             else:
                 matched_reg_str = self.reg_str[1:][started:ended]
             if started == False and started != 0:
-                print("{} PATH NOT FOUND.".format(dump_path))
+                print("[Error] {} PATH NOT FOUND.".format(dump_path))
                 return None
             matched_reg_str = [self.regedit_ver] + matched_reg_str
             
@@ -149,6 +149,9 @@ class Registry():
         import yarp
         if len(self.reg_str) == 0:
             self.dump_to_reg()
+        if dump_path is None:
+            print("[Error] {} CANNOT BE NONE.".format("dump_path"))
+            return None
         reg_root = dump_path.split('\\')[0]
         uuid_str = str(uuid.uuid4())
         dat_key = reg_root + '\\SOFTWARE\\' + uuid_str
@@ -170,7 +173,7 @@ class Registry():
         else:
             matched_reg_str = self.reg_str[1:][started:ended]
         if started == False and started != 0:
-            print("{} PATH NOT FOUND.".format(dump_path))
+            print("[Error] {} PATH NOT FOUND.".format(dump_path))
             return None
         matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
         redirected_reg_str.extend(matched_reg_str)
