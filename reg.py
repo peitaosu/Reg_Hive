@@ -83,6 +83,31 @@ class Registry():
         import yarp
         with open(dat_file_path, "rb") as in_file:
             self.reg_hive = yarp.Registry.RegistryHive(in_file)
+        root_key = self.reg_hive.root_key()
+
+        def process_key(key, parent):
+            name = key.name()
+            parent[name] = {
+                "Keys": {},
+                "Values": []
+            }
+            for value in key.values():
+                parent[name]["Values"].append(
+                    {
+                        "Name": value.name(),
+                        "Data": value.data(),
+                        "Type": value.type_str()
+                    }
+                )
+            for subkey in key.subkeys():
+                process_key(subkey, parent[name]["Keys"])
+        self.reg = {
+            "HKEY_LOCAL_MACHINE": {
+                "Keys": {},
+                "Values": []
+            }
+        }
+        process_key(root_key, self.reg["HKEY_LOCAL_MACHINE"]["Keys"])
         uuid_str = str(uuid.uuid4())
         dat_key = 'HKLM\\' + uuid_str
         reg_file = uuid_str + ".reg"
