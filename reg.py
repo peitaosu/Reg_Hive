@@ -95,7 +95,7 @@ class Registry():
                 parent[name]["Values"].append(
                     {
                         "Name": value.name(),
-                        "Data": value.data(),
+                        "Data": value.data().replace("\x00", "").replace("\\", "\\\\"),
                         "Type": value.type_str()
                     }
                 )
@@ -148,7 +148,7 @@ class Registry():
                 print("[Error] {} PATH NOT FOUND.".format(dump_path))
                 return None
             matched_reg_str = [self.regedit_ver] + matched_reg_str
-            
+        
         if reg_file_path is not None:  
             with open(reg_file_path, 'w') as reg_file:
                 if dump_path is None:
