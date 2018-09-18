@@ -80,9 +80,9 @@ class Registry():
             self.reg = json.load(json_file)
 
     def read_from_dat(self, dat_file_path):
-        import yarp
-        with open(dat_file_path, "rb") as in_file:
-            self.reg_hive = yarp.Registry.RegistryHive(in_file)
+        from yarp import Registry
+        in_file = open(dat_file_path, "rb")
+        self.reg_hive = Registry.RegistryHive(in_file)
         root_key = self.reg_hive.root_key()
 
         def process_key(key, parent):
@@ -101,20 +101,8 @@ class Registry():
                 )
             for subkey in key.subkeys():
                 process_key(subkey, parent[name]["Keys"])
-        self.reg = {
-            "HKEY_LOCAL_MACHINE": {
-                "Keys": {},
-                "Values": []
-            }
-        }
-        process_key(root_key, self.reg["HKEY_LOCAL_MACHINE"]["Keys"])
-        uuid_str = str(uuid.uuid4())
-        dat_key = 'HKLM\\' + uuid_str
-        reg_file = uuid_str + ".reg"
-        os.system('reg load {} {}'.format(dat_key, dat_file_path))
-        os.system('reg export {} {}'.format(dat_key, reg_file))
-        self.read_from_reg(reg_file)
-        os.system('reg unload {}'.format(dat_key))
+        process_key(root_key, self.reg)
+        in_file.close()
 
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
@@ -171,7 +159,6 @@ class Registry():
                     return matched_reg_str
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
-        import yarp
         if len(self.reg_str) == 0:
             self.dump_to_reg()
         if dump_path is None:
