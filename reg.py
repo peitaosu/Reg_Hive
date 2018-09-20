@@ -85,6 +85,9 @@ class Registry():
         self.reg_hive = Registry.RegistryHive(in_file)
         root_key = self.reg_hive.root_key()
 
+        def parse_reg_value_data(value_date):
+            return value_date.replace("\x00", "").replace("\\", "\\\\")
+
         def process_key(key, parent):
             name = key.name()
             parent[name] = {
@@ -95,7 +98,7 @@ class Registry():
                 parent[name]["Values"].append(
                     {
                         "Name": value.name(),
-                        "Data": value.data().replace("\x00", "").replace("\\", "\\\\"),
+                        "Data": parse_reg_value_data(value.data()),
                         "Type": value.type_str()
                     }
                 )
