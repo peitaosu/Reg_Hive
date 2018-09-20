@@ -5,7 +5,9 @@ Registry Tool
 
 Registry tool which support registry format conversion.
 
-To use dat format file it request administrator permission to execute reg command.
+To read dat format file it requests python module `yarp` has been installed, get from `pip install -r requirements.txt`.
+
+To dump dat format file it requests administrator permission to execute `reg` command.
 
 ## Supported Formats:
 * reg
