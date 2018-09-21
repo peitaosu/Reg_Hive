@@ -106,6 +106,12 @@ class Registry():
                 process_key(subkey, parent[name]["Keys"])
         process_key(root_key, self.reg)
         in_file.close()
+        for key in self.reg.keys():
+            reg_bak = self.reg[key]
+            self.reg = {
+                "HKEY_LOCAL_MACHINE": {}
+            }
+            self.reg["HKEY_LOCAL_MACHINE"] = reg_bak
 
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
