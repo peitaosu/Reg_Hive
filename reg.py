@@ -112,6 +112,7 @@ class Registry():
                 "HKEY_LOCAL_MACHINE": {}
             }
             self.reg["HKEY_LOCAL_MACHINE"] = reg_bak
+            break
 
     def dump_to_json(self, json_file_path):
         with open(json_file_path, 'w') as json_file:
