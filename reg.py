@@ -106,6 +106,8 @@ class Registry():
                 process_key(subkey, parent[name]["Keys"])
         process_key(root_key, self.reg)
         in_file.close()
+        if len(self.reg.keys()) > 1:
+            print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
         for key in self.reg.keys():
             reg_bak = self.reg[key]
             self.reg = {
