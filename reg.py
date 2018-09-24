@@ -207,6 +207,7 @@ class Registry():
         os.system('reg import {}'.format(temp_reg_file))
         os.system('reg save {} {} /y'.format(dat_key, dat_file_path))
         os.system('reg delete {} /f'.format(dat_key))
+        os.remove(temp_reg_file)
         return redirected_reg_str
 
 def get_options():
