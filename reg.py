@@ -157,6 +157,7 @@ class Registry():
                     started = iter
                 if self.reg_str[1:][iter].startswith('\n[') and not self.reg_str[1:][iter].startswith('\n[' + dump_path) and started != False:
                     ended = iter
+                    break
             if ended == False:
                 matched_reg_str = self.reg_str[1:][started:]
             else:
@@ -197,6 +198,7 @@ class Registry():
                 started = iter
             if self.reg_str[1:][iter].startswith('[') and not self.reg_str[1:][iter].startswith('[' + dump_path) and started != False:
                 ended = iter
+                break
         if ended == False:
             matched_reg_str = self.reg_str[1:][started:]
         else:
