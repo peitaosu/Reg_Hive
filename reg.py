@@ -132,7 +132,10 @@ class Registry():
                 self.reg_str.append('\n[{}]'.format(parent_str))
             for value in parent_key['Values']:
                 if value['Type'] == "REG_SZ":
-                    self.reg_str.append('"{}"="{}"'.format(value['Name'], value['Data']))
+                    if value['Name'] == '@':
+                        self.reg_str.append('@="{}"'.format(value['Data']))
+                    else:
+                        self.reg_str.append('"{}"="{}"'.format(value['Name'], value['Data']))
                 elif value['Type'] == "REG_DWORD":
                     self.reg_str.append('"{}"=dword:{}'.format(value['Name'], value['Data']))
                 elif value['Type'] == "REG_QWORD":
