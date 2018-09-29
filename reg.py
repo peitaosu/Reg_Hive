@@ -54,6 +54,8 @@ class Registry():
                 cur_key = cur_dict
             else:
                 value_name = reg_str.split('=')[0].strip('"')
+                if value_name == "":
+                    value_name = "@"
                 value_content = '='.join(reg_str.split('=')[1:])
                 if value_content.startswith('"'):
                     value_type = "REG_SZ"
