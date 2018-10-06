@@ -4,4 +4,6 @@
 # registry
 *.reg
 *.dat
+*.dat.LOG*
+*.dat{*}*
 *.json
