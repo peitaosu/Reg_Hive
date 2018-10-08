@@ -230,6 +230,9 @@ class Registry():
             if value["Name"] == reg_value:
                 value["Data"] = new_reg_data
 
+    def replace_with(self, origin, new):
+        self.reg = json.loads(json.dumps(self.reg).replace(origin, new))
+        
 def get_options():
     parser = optparse.OptionParser()
     parser.add_option("--in_reg", dest="in_reg",
