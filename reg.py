@@ -222,6 +222,14 @@ class Registry():
         os.remove(temp_reg_file)
         return redirected_reg_str
 
+    def update_value(self, reg_root, reg_key, reg_value, new_reg_data):
+        _key = self.reg[reg_root]
+        for key in reg_key.split("\\"):
+            _key = _key["Keys"][key]
+        for value in _key["Values"]:
+            if value["Name"] == reg_value:
+                value["Data"] = new_reg_data
+
 def get_options():
     parser = optparse.OptionParser()
     parser.add_option("--in_reg", dest="in_reg",
