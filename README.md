@@ -32,3 +32,15 @@ Options:
   --hive_key=HIVE_KEY  hive key save to dat
 
 ```
+
+## Usage (module)
+```
+from reg import Registry
+
+reg = Registry()
+reg.set_reg_file_encode("utf-16")
+reg.read_from_reg("example.reg")
+reg.update_value("HKEY_LOCAL_MACHINE", "SOFTWARE\\Example", "Example_Value", "New_Data")
+reg.dump_to_json("out.json")
+reg.dump_to_dat("out.dat")
+```
