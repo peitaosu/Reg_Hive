@@ -232,6 +232,9 @@ class Registry():
 
     def replace_with(self, origin, new):
         self.reg = json.loads(json.dumps(self.reg).replace(origin, new))
+    
+    def compare_to(self, another):
+        return self.reg.__cmp__(another.reg) == 0
         
 def get_options():
     parser = optparse.OptionParser()
