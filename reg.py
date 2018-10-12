@@ -1,4 +1,4 @@
-import os, sys, json, uuid, optparse
+import os, sys, json, uuid, optparse, difflib
 
 class Registry():
 
@@ -21,6 +21,10 @@ class Registry():
 
     def get_reg(self):
         return self.reg
+    
+    def get_reg_str(self):
+        self.dump_to_reg()
+        return self.reg_str
     
     def read_from_reg(self, reg_file_path):
         try:
@@ -235,7 +239,19 @@ class Registry():
     
     def is_same(self, another):
         return self.reg.__cmp__(another.reg) == 0
-        
+    
+    def compare_to(self, another):
+        if self.is_same(another):
+            return None
+        differ = difflib.Differ()
+        diff = differ.compare(self.get_reg_str(), another.get_reg_str())
+        result = list(diff)
+        length = len(result)
+        for i in range(length):
+            if not result[i].endswith("\n"):
+                result[i] += "\n"
+        return result
+
 def get_options():
     parser = optparse.OptionParser()
     parser.add_option("--in_reg", dest="in_reg",
