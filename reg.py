@@ -238,7 +238,7 @@ class Registry():
         self.reg = json.loads(json.dumps(self.reg).replace(origin, new))
     
     def is_same(self, another):
-        return self.reg.__cmp__(another.reg) == 0
+        return self.get_reg().__cmp__(another.get_reg()) == 0
     
     def compare_to(self, another):
         if self.is_same(another):
