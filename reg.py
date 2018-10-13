@@ -240,7 +240,7 @@ class Registry():
     def is_same(self, another):
         return self.get_reg().__cmp__(another.get_reg()) == 0
     
-    def compare_to(self, another):
+    def compare_to(self, another, diff_file=None):
         if self.is_same(another):
             return None
         differ = difflib.Differ()
@@ -250,6 +250,9 @@ class Registry():
         for i in range(length):
             if not result[i].endswith("\n"):
                 result[i] += "\n"
+        if diff_file is not None:
+            with open(diff_file, "w") as out_file:
+                out_file.writelines(result)
         return result
 
 def get_options():
