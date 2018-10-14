@@ -136,7 +136,7 @@ class Registry():
         def parse_key(parent_key, parent_str):
             if len(parent_key["Values"]) != 0:
                 self.reg_str.append("\n[{}]".format(parent_str))
-            for value in parent_key["Values"]:
+            for value in sorted(parent_key["Values"], key=lambda k: k["Name"]):
                 if value["Type"] == "REG_SZ":
                     if value["Name"] == "@":
                         self.reg_str.append('@="{}"'.format(value["Data"]))
@@ -150,7 +150,7 @@ class Registry():
                     self.reg_str.append('"{}"=hex:{}'.format(value["Name"], value["Data"]))
                 elif value["Type"] == "REG_EXPAND_SZ":
                     self.reg_str.append('"{}"=hex(2):{}'.format(value["Name"], value["Data"]))
-            for key in parent_key["Keys"]:
+            for key in sorted(parent_key["Keys"]):
                 parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
 
         for root in self.reg:
