@@ -137,19 +137,22 @@ class Registry():
             if len(parent_key["Values"]) != 0:
                 self.reg_str.append("\n[{}]".format(parent_str))
             for value in sorted(parent_key["Values"], key=lambda k: k["Name"]):
-                if value["Type"] == "REG_SZ":
-                    if value["Name"] == "@":
-                        self.reg_str.append('@="{}"'.format(value["Data"]))
-                    else:
-                        self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
-                elif value["Type"] == "REG_DWORD":
-                    self.reg_str.append('"{}"=dword:{}'.format(value["Name"], value["Data"]))
-                elif value["Type"] == "REG_QWORD":
-                    self.reg_str.append('"{}"=qword:{}'.format(value["Name"], value["Data"]))
-                elif value["Type"] == "REG_BINARY":
-                    self.reg_str.append('"{}"=hex:{}'.format(value["Name"], value["Data"]))
-                elif value["Type"] == "REG_EXPAND_SZ":
-                    self.reg_str.append('"{}"=hex(2):{}'.format(value["Name"], value["Data"]))
+                try:
+                    if value["Type"] == "REG_SZ":
+                        if value["Name"] == "@":
+                            self.reg_str.append('@="{}"'.format(value["Data"]))
+                        else:
+                            self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
+                    elif value["Type"] == "REG_DWORD":
+                        self.reg_str.append('"{}"=dword:{}'.format(value["Name"], value["Data"]))
+                    elif value["Type"] == "REG_QWORD":
+                        self.reg_str.append('"{}"=qword:{}'.format(value["Name"], value["Data"]))
+                    elif value["Type"] == "REG_BINARY":
+                        self.reg_str.append('"{}"=hex:{}'.format(value["Name"], value["Data"]))
+                    elif value["Type"] == "REG_EXPAND_SZ":
+                        self.reg_str.append('"{}"=hex(2):{}'.format(value["Name"], value["Data"]))
+                except:
+                    print("[Error] EXCEPTION ON {}".format(value))
             for key in sorted(parent_key["Keys"]):
                 parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
 
