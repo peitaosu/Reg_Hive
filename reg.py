@@ -94,8 +94,12 @@ class Registry():
         self.reg_hive = Registry.RegistryHive(in_file)
         root_key = self.reg_hive.root_key()
 
-        def parse_reg_value_data(value_date):
-            return value_date.replace("\x00", "").replace("\\", "\\\\")
+        def parse_reg_value_data(value_data):
+            if type(value_data) in [str, unicode]:
+                return value_data.replace("\x00", "").replace("\\", "\\\\")
+            if type(value_data) in [list]:
+                return [data.replace("\x00", "").replace("\\", "\\\\") for data in value_data]
+            return value_data
 
         def process_key(key, parent):
             name = key.name()
