@@ -241,6 +241,12 @@ class Registry():
             if value["Name"] == reg_value:
                 value["Data"] = new_reg_data
 
+    def update_key_name(self, reg_root, reg_key, new_key_name):
+        _key = self.reg[reg_root]
+        for key in reg_key.split("\\")[:-1]:
+            _key = _key["Keys"][key]
+        _key["Keys"][new_key_name] = _key["Keys"].pop(reg_key.split("\\")[-1])
+        
     def replace_with(self, origin, new):
         self.reg = json.loads(json.dumps(self.reg).replace(origin, new))
     
