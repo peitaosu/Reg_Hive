@@ -155,6 +155,8 @@ class Registry():
                         self.reg_str.append('"{}"=hex:{}'.format(value["Name"], value["Data"]))
                     elif value["Type"] == "REG_EXPAND_SZ":
                         self.reg_str.append('"{}"=hex(2):{}'.format(value["Name"], value["Data"]))
+                    else:
+                        self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
                 except:
                     print("[Error] EXCEPTION ON {}".format(value))
             for key in sorted(parent_key["Keys"]):
