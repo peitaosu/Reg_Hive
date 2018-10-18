@@ -40,7 +40,9 @@ from reg import Registry
 reg = Registry()
 reg.set_reg_file_encode("utf-16")
 reg.read_from_reg("example.reg")
+reg.update_key_name("HKEY_LOCAL_MACHINE", "SOFTWARE\\Example", "SOFTWARE\\New_Key")
 reg.update_value("HKEY_LOCAL_MACHINE", "SOFTWARE\\Example", "Example_Value", "New_Data")
+reg.replace_with("ORIGINAL", "NEW")
 reg.dump_to_json("out.json")
 reg.dump_to_dat("out.dat")
 ```
