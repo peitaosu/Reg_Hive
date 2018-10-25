@@ -76,6 +76,9 @@ class Registry():
                 elif value_content.startswith("hex(2)"):
                     value_type = "REG_EXPAND_SZ"
                     value_data = value_content.split(":")[1]
+                elif value_content.startswith("hex(7)"):
+                    value_type = "REG_MULTI_SZ"
+                    value_data = value_content.split(":")[1]
                 cur_key["Values"].append(
                     {
                         "Name": value_name,
@@ -155,6 +158,8 @@ class Registry():
                         self.reg_str.append('"{}"=hex:{}'.format(value["Name"], value["Data"]))
                     elif value["Type"] == "REG_EXPAND_SZ":
                         self.reg_str.append('"{}"=hex(2):{}'.format(value["Name"], value["Data"]))
+                    elif value["Type"] == "REG_MULTI_SZ":
+                        self.reg_str.append('"{}"=hex(7):{}'.format(value["Name"], value["Data"]))
                     else:
                         self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
                 except:
