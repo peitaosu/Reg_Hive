@@ -35,57 +35,60 @@ class Registry():
                 self.reg_str = reg_file.read().replace("\\\r\n  ", "").split("\r\n")
         self.reg_str = filter(None, self.reg_str)
         for reg_str in self.reg_str:
-            if reg_str == self.regedit_ver:
-                continue
-            if reg_str.startswith("["):
-                reg_str = reg_str[1:-1]
-                reg_root = reg_str.split("\\")[0]
-                if reg_root not in self.reg:
-                    self.reg[reg_root] = {
-                        "Keys": {},
-                        "Values": []
-                        }
-                cur_dict = self.reg[reg_root]
-                for reg_key in reg_str.split("\\")[1:]:
-                    if reg_key not in cur_dict["Keys"].keys():
-                        cur_dict["Keys"][reg_key] = {
+            try:
+                if reg_str == self.regedit_ver:
+                    continue
+                if reg_str.startswith("["):
+                    reg_str = reg_str[1:-1]
+                    reg_root = reg_str.split("\\")[0]
+                    if reg_root not in self.reg:
+                        self.reg[reg_root] = {
                             "Keys": {},
                             "Values": []
+                            }
+                    cur_dict = self.reg[reg_root]
+                    for reg_key in reg_str.split("\\")[1:]:
+                        if reg_key not in cur_dict["Keys"].keys():
+                            cur_dict["Keys"][reg_key] = {
+                                "Keys": {},
+                                "Values": []
+                            }
+                            cur_dict = cur_dict["Keys"][reg_key]
+                        else:
+                            cur_dict = cur_dict["Keys"][reg_key]
+                    cur_key = cur_dict
+                else:
+                    value_name = reg_str.split("=")[0].strip('"')
+                    if value_name == "":
+                        value_name = "@"
+                    value_content = "=".join(reg_str.split("=")[1:])
+                    if value_content.startswith('"'):
+                        value_type = "REG_SZ"
+                        value_data = value_content.strip('"')
+                    elif value_content.startswith("dword"):
+                        value_type = "REG_DWORD"
+                        value_data = value_content.split(":")[1]
+                    elif value_content.startswith("qword"):
+                        value_type = "REG_QWORD"
+                        value_data = value_content.split(":")[1]
+                    elif value_content.startswith("hex:"):
+                        value_type = "REG_BINARY"
+                        value_data = value_content.split(":")[1]
+                    elif value_content.startswith("hex(2)"):
+                        value_type = "REG_EXPAND_SZ"
+                        value_data = value_content.split(":")[1]
+                    elif value_content.startswith("hex(7)"):
+                        value_type = "REG_MULTI_SZ"
+                        value_data = value_content.split(":")[1]
+                    cur_key["Values"].append(
+                        {
+                            "Name": value_name,
+                            "Type": value_type,
+                            "Data": value_data
                         }
-                        cur_dict = cur_dict["Keys"][reg_key]
-                    else:
-                        cur_dict = cur_dict["Keys"][reg_key]
-                cur_key = cur_dict
-            else:
-                value_name = reg_str.split("=")[0].strip('"')
-                if value_name == "":
-                    value_name = "@"
-                value_content = "=".join(reg_str.split("=")[1:])
-                if value_content.startswith('"'):
-                    value_type = "REG_SZ"
-                    value_data = value_content.strip('"')
-                elif value_content.startswith("dword"):
-                    value_type = "REG_DWORD"
-                    value_data = value_content.split(":")[1]
-                elif value_content.startswith("qword"):
-                    value_type = "REG_QWORD"
-                    value_data = value_content.split(":")[1]
-                elif value_content.startswith("hex:"):
-                    value_type = "REG_BINARY"
-                    value_data = value_content.split(":")[1]
-                elif value_content.startswith("hex(2)"):
-                    value_type = "REG_EXPAND_SZ"
-                    value_data = value_content.split(":")[1]
-                elif value_content.startswith("hex(7)"):
-                    value_type = "REG_MULTI_SZ"
-                    value_data = value_content.split(":")[1]
-                cur_key["Values"].append(
-                    {
-                        "Name": value_name,
-                        "Type": value_type,
-                        "Data": value_data
-                    }
-                )
+                    )
+            except Exception as e:
+                print("[Error] EXCEPTION ON {}: {}".format(reg_str, str(e)))
 
     def read_from_json(self, json_file_path):
         with open(json_file_path) as json_file:
@@ -162,8 +165,8 @@ class Registry():
                         self.reg_str.append('"{}"=hex(7):{}'.format(value["Name"], value["Data"]))
                     else:
                         self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
-                except:
-                    print("[Error] EXCEPTION ON {}".format(value))
+                except Exception as e:
+                    print("[Error] EXCEPTION ON {}: {}".format(value, str(e)))
             for key in sorted(parent_key["Keys"]):
                 parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
 
