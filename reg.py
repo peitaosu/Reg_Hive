@@ -11,22 +11,52 @@ class Registry():
         self.reg_hive = None
     
     def set_reg_file_encode(self, reg_file_encode):
+        """update self.reg_file_encode which will be used to read *.reg file
+
+        args:
+            reg_file_encode (str)
+        """
         self.reg_file_encode = reg_file_encode
     
     def set_regedit_ver(self, regedit_ver):
+        """update self.regedit_ver which will be used in reg string
+
+        args:
+            regedit_ver (str)
+        """
         self.regedit_ver = regedit_ver
     
     def set_reg(self, reg):
+        """update self.reg which is a dictionary
+
+        args:
+            reg (dict)
+        """
         self.reg = reg
 
     def get_reg(self):
+        """get self.reg which is a dictionary
+
+        returns:
+            self.reg (dict)
+        """
         return self.reg
     
     def get_reg_str(self):
+        """get reg string which can be saved to *.reg
+        
+        returns:
+            reg_str (list)
+        """
         self.dump_to_reg()
         return self.reg_str
     
     def read_from_reg(self, reg_file_path):
+        """read reg string from *.reg file and convert to dict type object - self.reg
+
+        args:
+            reg_file_path (str)
+        """
         try:
             with open(reg_file_path) as reg_file:    
                 self.reg_str = reg_file.read().decode(self.reg_file_encode).replace("\\\r\n  ", "").split("\r\n")
@@ -91,10 +121,20 @@ class Registry():
                 print("[Error] EXCEPTION ON {}: {}".format(reg_str, str(e)))
 
     def read_from_json(self, json_file_path):
+        """read reg dict object from *.json file and update self.reg
+
+        args:
+            json_file_path (str)
+        """
         with open(json_file_path) as json_file:
             self.reg = json.load(json_file)
 
     def read_from_dat(self, dat_file_path):
+        """read reg items from *.dat file and convert to dict type object - self.reg
+
+        args:
+            dat_file_path (str)
+        """
         from yarp import Registry
         in_file = open(dat_file_path, "rb")
         self.reg_hive = Registry.RegistryHive(in_file)
@@ -136,10 +176,24 @@ class Registry():
             break
 
     def dump_to_json(self, json_file_path):
+        """dump dict type object self.reg to *.json file
+
+        args:
+            json_file_path (str)
+        """
         with open(json_file_path, "w") as json_file:
             json.dump(self.reg, json_file, indent=4)
 
     def dump_to_reg(self, reg_file_path=None, dump_path=None):
+        """convert and dump dict type object self.reg to *.reg file
+
+        args:
+            reg_file_path (str)
+            dump_path (reg path)
+        
+        returns:
+            reg_str (list)
+        """
         self.reg_str = []
         self.reg_str.append(self.regedit_ver)
 
@@ -203,6 +257,16 @@ class Registry():
                     return matched_reg_str
 
     def dump_to_dat(self, dat_file_path, dump_path, redirect_path = None):
+        """convert and dump dict type object self.reg to *.dat file
+
+        args:
+            dat_file_path (str)
+            dump_path (reg path)
+            redirect_path (reg_path)
+        
+        returns:
+            reg_str (list)
+        """
         if len(self.reg_str) == 0:
             self.dump_to_reg()
         if dump_path is None:
@@ -244,6 +308,14 @@ class Registry():
         return redirected_reg_str
 
     def update_value(self, reg_root, reg_key, reg_value, new_reg_data):
+        """update date of registry value
+
+        args:
+            reg_root (str)
+            reg_key (str)
+            reg_value (str)
+            new_reg_data (str)
+        """
         _key = self.reg[reg_root]
         for key in reg_key.split("\\"):
             _key = _key["Keys"][key]
@@ -252,18 +324,45 @@ class Registry():
                 value["Data"] = new_reg_data
 
     def update_key_name(self, reg_root, reg_key, new_key_name):
+        """update name of registry key
+
+        args:
+            reg_root (str)
+            reg_key (str)
+            new_key_name (str)
+        """
         _key = self.reg[reg_root]
         for key in reg_key.split("\\")[:-1]:
             _key = _key["Keys"][key]
         _key["Keys"][new_key_name] = _key["Keys"].pop(reg_key.split("\\")[-1])
         
     def replace_with(self, origin, new):
+        """replace specific string in reg object
+
+        args:
+            origin (str)
+            new (str)
+        """
         self.reg = json.loads(json.dumps(self.reg).replace(origin, new))
     
     def is_same(self, another):
+        """check if same with another Registry object
+
+        args:
+            another (Registry)
+        """
         return self.get_reg().__cmp__(another.get_reg()) == 0
     
     def compare_to(self, another, diff_file=None):
+        """compare to another Registry object and save as diff file
+
+        args:
+            another (Registry)
+            diff_file (str)
+        
+        returns:
+            diff_result (list)
+        """
         if self.is_same(another):
             return None
         differ = difflib.Differ()
