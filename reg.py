@@ -129,7 +129,7 @@ class Registry():
         with open(json_file_path) as json_file:
             self.reg = json.load(json_file)
 
-    def read_from_dat(self, dat_file_path):
+    def read_from_dat(self, dat_file_path, hive_replace_key=None, hive_load_path=None):
         """read reg items from *.dat file and convert to dict type object - self.reg
 
         args:
@@ -169,10 +169,35 @@ class Registry():
             print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
         for key in self.reg.keys():
             reg_bak = self.reg[key]
-            self.reg = {
-                "HKEY_LOCAL_MACHINE": {}
-            }
-            self.reg["HKEY_LOCAL_MACHINE"] = reg_bak
+            if not hive_replace_key:
+                if hive_replace_key.split("\\")[0] is not key:
+                    print("[Warning] HIVE REPLACE KEY NOT MATCH.")
+                    break
+                reg_rep = self.reg[key]
+                for sub_path in hive_replace_key.split("\\")[1:]:
+                    try:
+                        reg_rep = reg_rep["Keys"][sub_path]
+                    except:
+                        print("[Warning] HIVE REPLACE KEY NOT MATCH.")
+                        break
+                reg_bak = reg_rep
+            if not hive_load_path:
+                reg_load = {hive_load_path.split("\\")[0]:{}}
+                reg_len = len(hive_load_path.split("\\")[1:])
+                def load_key(key, parent, index):
+                    parent["Keys"] = {}
+                    parent["Keys"][key] = {}
+                    if reg_len is not index:
+                        load_key(hive_load_path.split("\\")[index+2], parent["Keys"][key], index+1)
+                    else:
+                        parent["Keys"][key]["Keys"] = reg_bak
+                load_key(hive_load_path.split("\\")[1], reg_load[hive_load_path.split("\\")[0]], 1)
+                self.reg = reg_load
+            else:
+                self.reg = {
+                    "HKEY_LOCAL_MACHINE": {}
+                }
+                self.reg["HKEY_LOCAL_MACHINE"] = reg_bak
             break
 
     def dump_to_json(self, json_file_path):
