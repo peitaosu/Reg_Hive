@@ -170,10 +170,11 @@ class Registry():
         for key in self.reg.keys():
             reg_bak = self.reg[key]
             if hive_replace_key:
-                if hive_replace_key.split("\\")[0] is not key:
+                first_key = hive_replace_key.split("\\")[0]
+                if first_key not in self.reg[key]["Keys"]:
                     print("[Warning] HIVE REPLACE KEY NOT MATCH.")
                     break
-                reg_rep = self.reg[key]
+                reg_rep = self.reg[key]["Keys"][first_key]
                 for sub_path in hive_replace_key.split("\\")[1:]:
                     try:
                         reg_rep = reg_rep["Keys"][sub_path]
@@ -182,16 +183,20 @@ class Registry():
                         break
                 reg_bak = reg_rep
             if hive_load_path:
-                reg_load = {hive_load_path.split("\\")[0]:{}}
+                first_key = hive_load_path.split("\\")[0]
+                reg_load = {first_key:{}}
                 reg_len = len(hive_load_path.split("\\")[1:])
-                def load_key(key, parent, index):
-                    parent["Keys"] = {}
-                    parent["Keys"][key] = {}
-                    if reg_len is not index:
-                        load_key(hive_load_path.split("\\")[index+2], parent["Keys"][key], index+1)
-                    else:
-                        parent["Keys"][key]["Keys"] = reg_bak
-                load_key(hive_load_path.split("\\")[1], reg_load[hive_load_path.split("\\")[0]], 1)
+                if reg_len > 0:
+                    def load_key(key, parent, index):
+                        parent["Keys"] = {}
+                        parent["Keys"][key] = {}
+                        if reg_len is not index:
+                            load_key(hive_load_path.split("\\")[index+2], parent["Keys"][key], index+1)
+                        else:
+                            parent["Keys"][key] = reg_bak
+                    load_key(hive_load_path.split("\\")[1], reg_load[hive_load_path.split("\\")[0]], 1)
+                else:
+                    reg_load[first_key] = reg_bak
                 self.reg = reg_load
             else:
                 self.reg = {
