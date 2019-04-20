@@ -168,20 +168,20 @@ class Registry():
         if len(self.reg.keys()) > 1:
             print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
         for key in self.reg.keys():
-            reg_bak = self.reg[key]
+            reg_backup = self.reg[key]
             if hive_replace_key:
                 first_key = hive_replace_key.split("\\")[0]
                 if first_key not in self.reg[key]["Keys"]:
                     print("[Warning] HIVE REPLACE KEY NOT MATCH.")
                     break
-                reg_rep = self.reg[key]["Keys"][first_key]
+                reg_replace = self.reg[key]["Keys"][first_key]
                 for sub_path in hive_replace_key.split("\\")[1:]:
                     try:
-                        reg_rep = reg_rep["Keys"][sub_path]
+                        reg_replace = reg_replace["Keys"][sub_path]
                     except:
                         print("[Warning] HIVE REPLACE KEY NOT MATCH.")
                         break
-                reg_bak = reg_rep
+                reg_backup = reg_replace
             if hive_load_path:
                 first_key = hive_load_path.split("\\")[0]
                 reg_load = {first_key:{}}
@@ -193,16 +193,16 @@ class Registry():
                         if reg_len is not index:
                             load_key(hive_load_path.split("\\")[index+2], parent["Keys"][key], index+1)
                         else:
-                            parent["Keys"][key] = reg_bak
+                            parent["Keys"][key] = reg_backup
                     load_key(hive_load_path.split("\\")[1], reg_load[hive_load_path.split("\\")[0]], 1)
                 else:
-                    reg_load[first_key] = reg_bak
+                    reg_load[first_key] = reg_backup
                 self.reg = reg_load
             else:
                 self.reg = {
                     "HKEY_LOCAL_MACHINE": {}
                 }
-                self.reg["HKEY_LOCAL_MACHINE"] = reg_bak
+                self.reg["HKEY_LOCAL_MACHINE"] = reg_backup
             break
 
     def dump_to_json(self, json_file_path):
