@@ -169,7 +169,7 @@ class Registry():
             print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
         for key in self.reg.keys():
             reg_bak = self.reg[key]
-            if not hive_replace_key:
+            if hive_replace_key:
                 if hive_replace_key.split("\\")[0] is not key:
                     print("[Warning] HIVE REPLACE KEY NOT MATCH.")
                     break
@@ -181,7 +181,7 @@ class Registry():
                         print("[Warning] HIVE REPLACE KEY NOT MATCH.")
                         break
                 reg_bak = reg_rep
-            if not hive_load_path:
+            if hive_load_path:
                 reg_load = {hive_load_path.split("\\")[0]:{}}
                 reg_len = len(hive_load_path.split("\\")[1:])
                 def load_key(key, parent, index):
