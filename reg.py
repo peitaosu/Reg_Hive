@@ -336,6 +336,16 @@ class Registry():
         os.system("reg delete {} /f".format(dat_key))
         os.remove(temp_reg_file)
         return redirected_reg_str
+    
+    def write_to_registry(self):
+        """write registry keys\values to actual system registry
+        """
+        uuid_str = str(uuid.uuid4())
+        temp_reg_file = uuid_str + ".reg"
+        with open(temp_reg_file, "w") as reg_file:
+            reg_file.write("\n".join(self.reg_str))
+        os.system("reg import {}".format(temp_reg_file))
+        os.remove(temp_reg_file)
 
     def update_value(self, reg_root, reg_key, reg_value, new_reg_data):
         """update date of registry value
