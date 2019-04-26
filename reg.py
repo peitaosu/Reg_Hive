@@ -437,6 +437,10 @@ def get_options():
                       help="hive key save to dat")
     parser.add_option("--redirect", dest="redirect",
                       help="redirect dat key")
+    parser.add_option("--load", dest="load",
+                      help="load specific dat key")
+    parser.add_option("--replace", dest="replace",
+                      help="replace specific dat key")
     (options, args) = parser.parse_args()
     return options
 
@@ -449,7 +453,13 @@ if __name__=="__main__":
     if opt.in_json:
         reg.read_from_json(opt.in_json)
     if opt.in_dat:
-        reg.read_from_dat(opt.in_dat)
+        if opt.replace:
+            if opt.load:
+                reg.read_from_dat(opt.in_dat, opt.replace, opt.load)
+            else:
+                reg.read_from_dat(opt.in_dat, opt.replace)
+        else:
+            reg.read_from_dat(opt.in_dat)
 
     if opt.out_reg:
         reg.dump_to_reg(opt.out_reg, opt.reg_key)

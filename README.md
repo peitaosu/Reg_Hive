@@ -26,11 +26,13 @@ Options:
   --in_json=IN_JSON    read from json file
   --in_dat=IN_DAT      read from dat file
   --out_reg=OUT_REG    dump to reg file
+  --reg_key=REG_KEY    reg key save to reg
   --out_json=OUT_JSON  dump to json file
   --out_dat=OUT_DAT    dump to dat file
-  --reg_key=REG_KEY    reg key save to reg
   --hive_key=HIVE_KEY  hive key save to dat
-
+  --redirect=REDIRECT  redirect dat key
+  --load=LOAD          load specific dat key
+  --replace=REPLACE    replace specific dat key
 ```
 
 ## Usage (module)
