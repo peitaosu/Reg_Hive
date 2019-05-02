@@ -1,4 +1,4 @@
-import os, sys, json, uuid, optparse, difflib
+import os, sys, json, uuid, optparse, difflib, platform
 
 class Registry():
 
@@ -331,15 +331,21 @@ class Registry():
         temp_reg_file = uuid_str + ".reg"
         with open(temp_reg_file, "w") as reg_file:
             reg_file.write("\n".join(redirected_reg_str))
-        os.system("reg import {}".format(temp_reg_file))
-        os.system("reg save {} {} /y".format(dat_key, dat_file_path))
-        os.system("reg delete {} /f".format(dat_key))
+        if platform.system() == "Windows":
+            os.system("reg import {}".format(temp_reg_file))
+            os.system("reg save {} {} /y".format(dat_key, dat_file_path))
+            os.system("reg delete {} /f".format(dat_key))
+        else:
+            print("Only Windows supports registry, your OS is {}".format(platform.system()))
         os.remove(temp_reg_file)
         return redirected_reg_str
     
     def write_to_registry(self):
         """write registry keys\values to actual system registry
         """
+        if platform.system() != "Windows":
+            print("Only Windows supports registry, your OS is {}".format(platform.system()))
+            return
         uuid_str = str(uuid.uuid4())
         temp_reg_file = uuid_str + ".reg"
         with open(temp_reg_file, "w") as reg_file:
