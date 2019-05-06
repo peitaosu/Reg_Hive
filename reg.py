@@ -140,14 +140,14 @@ class Registry():
         self.reg_hive = Registry.RegistryHive(in_file)
         root_key = self.reg_hive.root_key()
 
-        def parse_reg_value_data(value_data):
+        def _parse_reg_value_data(value_data):
             if type(value_data) in [str, unicode]:
                 return value_data.replace("\x00", "").replace("\\", "\\\\")
             if type(value_data) in [list]:
                 return [data.replace("\x00", "").replace("\\", "\\\\") for data in value_data]
             return value_data
 
-        def process_key(key, parent):
+        def _process_key(key, parent):
             name = key.name()
             parent[name] = {
                 "Keys": {},
@@ -157,13 +157,13 @@ class Registry():
                 parent[name]["Values"].append(
                     {
                         "Name": value.name(),
-                        "Data": parse_reg_value_data(value.data()),
+                        "Data": _parse_reg_value_data(value.data()),
                         "Type": value.type_str()
                     }
                 )
             for subkey in key.subkeys():
                 process_key(subkey, parent[name]["Keys"])
-        process_key(root_key, self.reg)
+        _process_key(root_key, self.reg)
         in_file.close()
         if len(self.reg.keys()) > 1:
             print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
