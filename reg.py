@@ -227,7 +227,7 @@ class Registry():
         self.reg_str = []
         self.reg_str.append(self.regedit_ver)
 
-        def parse_key(parent_key, parent_str):
+        def _parse_key(parent_key, parent_str):
             if len(parent_key["Values"]) != 0:
                 self.reg_str.append("\n[{}]".format(parent_str))
             for value in sorted(parent_key["Values"], key=lambda k: k["Name"]):
@@ -252,12 +252,12 @@ class Registry():
                 except Exception as e:
                     print("[Error] EXCEPTION ON {}: {}".format(value, str(e)))
             for key in sorted(parent_key["Keys"]):
-                parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
+                _parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
 
         for root in self.reg:
             key_path = root
             cur_key = self.reg[root]
-            parse_key(cur_key, key_path)
+            _parse_key(cur_key, key_path)
 
         if dump_path is not None:
             started = False
