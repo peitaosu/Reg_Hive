@@ -1,4 +1,4 @@
-import os, sys, json, uuid, optparse, difflib, platform
+import os, sys, json, uuid, optparse, difflib, platform, subprocess
 
 class Registry():
 
@@ -9,7 +9,28 @@ class Registry():
         self.reg_file_encode = "utf-16"
         self.regedit_ver = "Windows Registry Editor Version 5.00"
         self.reg_hive = None
+        self.log = "reg.log"
     
+    def set_log(self, log_path):
+        """set path to log file
+
+        args:
+            log_path (str)
+        """
+        self.log = log_path
+    
+    def _log(self, log_str, print_to_console=True):
+        """write log string to log file
+
+        args:
+            log_str (str)
+            print_to_console (bool)
+        """
+        if print_to_console:
+            print(log_str)
+        with open(self.log, "a") as in_file:
+            in_file.write("{}\n".format(log_str))
+
     def set_reg_file_encode(self, reg_file_encode):
         """update self.reg_file_encode which will be used to read *.reg file
 
@@ -332,9 +353,15 @@ class Registry():
         with open(temp_reg_file, "w") as reg_file:
             reg_file.write("\n".join(redirected_reg_str))
         if platform.system() == "Windows":
-            os.system("reg import {}".format(temp_reg_file))
-            os.system("reg save {} {} /y".format(dat_key, dat_file_path))
-            os.system("reg delete {} /f".format(dat_key))
+            command = "reg import {}".format(temp_reg_file)
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+            self._log("[REG] Output:{}".format(output))
+            command = "reg save {} {} /y".format(dat_key, dat_file_path)
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+            self._log("[REG] Output:{}".format(output))
+            command = "reg delete {} /f".format(dat_key)
+            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+            self._log("[REG] Output:{}".format(output))
         else:
             print("Only Windows supports registry, your OS is {}".format(platform.system()))
         os.remove(temp_reg_file)
@@ -350,7 +377,9 @@ class Registry():
         temp_reg_file = uuid_str + ".reg"
         with open(temp_reg_file, "w") as reg_file:
             reg_file.write("\n".join(self.reg_str))
-        os.system("reg import {}".format(temp_reg_file))
+        command = "reg import {}".format(temp_reg_file)
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+        self._log("[REG] Output:{}".format(output))
         os.remove(temp_reg_file)
 
     def update_value(self, reg_root, reg_key, reg_value, new_reg_data):
@@ -447,6 +476,8 @@ def get_options():
                       help="load specific dat key")
     parser.add_option("--replace", dest="replace",
                       help="replace specific dat key")
+    parser.add_option("--log", dest="log",
+                      help="path to log file")
     (options, args) = parser.parse_args()
     return options
 
@@ -454,6 +485,8 @@ if __name__=="__main__":
     opt = get_options()
 
     reg = Registry()
+    if opt.log:
+        reg.set_log(opt.log)
     if opt.in_reg:
         reg.read_from_reg(opt.in_reg)
     if opt.in_json:
