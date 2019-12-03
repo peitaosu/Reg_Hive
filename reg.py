@@ -8,8 +8,8 @@ class Registry():
         # suppose the input file using utf-16 because it's default encoding of regedit exported file
         self.reg_file_encode = "utf-16"
         self.regedit_ver = "Windows Registry Editor Version 5.00"
-        self.reg_hive = None
         self.log = "reg.log"
+        self.regdat = os.path.join(os.path.dirname(os.path.abspath(__file__)), "regdat.exe")
     
     def set_log(self, log_path):
         """set path to log file
@@ -156,75 +156,13 @@ class Registry():
         args:
             dat_file_path (str)
         """
-        from yarp import Registry
-        in_file = open(dat_file_path, "rb")
-        self.reg_hive = Registry.RegistryHive(in_file)
-        root_key = self.reg_hive.root_key()
-
-        def _parse_reg_value_data(value_data):
-            if type(value_data) in [str, unicode]:
-                return value_data.replace("\x00", "").replace("\\", "\\\\")
-            if type(value_data) in [list]:
-                return [data.replace("\x00", "").replace("\\", "\\\\") for data in value_data]
-            return value_data
-
-        def _process_key(key, parent):
-            name = key.name()
-            parent[name] = {
-                "Keys": {},
-                "Values": []
-            }
-            for value in key.values():
-                parent[name]["Values"].append(
-                    {
-                        "Name": value.name(),
-                        "Data": _parse_reg_value_data(value.data()),
-                        "Type": value.type_str()
-                    }
-                )
-            for subkey in key.subkeys():
-                process_key(subkey, parent[name]["Keys"])
-        _process_key(root_key, self.reg)
-        in_file.close()
-        if len(self.reg.keys()) > 1:
-            print("[Warning] CONTAINS MORE THAN 1 KEY ROOT.")
-        for key in self.reg.keys():
-            reg_backup = self.reg[key]
-            if hive_replace_key:
-                first_key = hive_replace_key.split("\\")[0]
-                if first_key not in self.reg[key]["Keys"]:
-                    print("[Warning] HIVE REPLACE KEY NOT MATCH.")
-                    break
-                reg_replace = self.reg[key]["Keys"][first_key]
-                for sub_path in hive_replace_key.split("\\")[1:]:
-                    try:
-                        reg_replace = reg_replace["Keys"][sub_path]
-                    except:
-                        print("[Warning] HIVE REPLACE KEY NOT MATCH.")
-                        break
-                reg_backup = reg_replace
-            if hive_load_path:
-                first_key = hive_load_path.split("\\")[0]
-                reg_load = {first_key:{}}
-                reg_len = len(hive_load_path.split("\\")[1:])
-                if reg_len > 0:
-                    def load_key(key, parent, index):
-                        parent["Keys"] = {}
-                        parent["Keys"][key] = {}
-                        if reg_len is not index:
-                            load_key(hive_load_path.split("\\")[index+2], parent["Keys"][key], index+1)
-                        else:
-                            parent["Keys"][key] = reg_backup
-                    load_key(hive_load_path.split("\\")[1], reg_load[hive_load_path.split("\\")[0]], 1)
-                else:
-                    reg_load[first_key] = reg_backup
-                self.reg = reg_load
-            else:
-                self.reg = {
-                    "HKEY_LOCAL_MACHINE": {}
-                }
-                self.reg["HKEY_LOCAL_MACHINE"] = reg_backup
-            break
+        uuid_str = str(uuid.uuid4())
+        temp_reg_file = uuid_str + ".reg"
+        command = "regdat --dat2reg --in_dat {} --out_reg {}".format(dat_file_path, temp_reg_file)
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
+        self._log("[REG] Output:{}".format(output))
+        self.read_from_reg(temp_reg_file)
+        os.remove(temp_reg_file)
 
     def dump_to_json(self, json_file_path):
         """dump dict type object self.reg to *.json file
