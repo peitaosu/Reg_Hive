@@ -261,13 +261,6 @@ class Registry():
         if dump_path is None:
             print("[Error] {} CANNOT BE NONE.".format("dump_path"))
             return None
-        reg_root = dump_path.split("\\")[0]
-        uuid_str = str(uuid.uuid4())
-        dat_key = reg_root + "\\SOFTWARE\\" + uuid_str
-        if redirect_path == None:
-            redirect_path = dat_key
-        else:
-            redirect_path = dat_key + "\\" + redirect_path
         redirected_reg_str = []
         redirected_reg_str.append(self.regedit_ver)
         started = False
@@ -285,19 +278,14 @@ class Registry():
         if started == False and started != 0:
             print("[Error] {} PATH NOT FOUND.".format(dump_path))
             return None
-        matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
+        if redirect_path:
+            matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
         redirected_reg_str.extend(matched_reg_str)
         temp_reg_file = uuid_str + ".reg"
         with open(temp_reg_file, "w") as reg_file:
             reg_file.write("\n".join(redirected_reg_str))
         if platform.system() == "Windows":
-            command = "reg import {}".format(temp_reg_file)
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-            self._log("[REG] Output:{}".format(output))
-            command = "reg save {} {} /y".format(dat_key, dat_file_path)
-            output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-            self._log("[REG] Output:{}".format(output))
-            command = "reg delete {} /f".format(dat_key)
+            command = "regdat --reg2dat --in_reg {} --out_dat {}".format(temp_reg_file, dat_file_path)
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
             self._log("[REG] Output:{}".format(output))
         else:

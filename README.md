@@ -5,7 +5,8 @@ Registry Tool
 
 Registry tool which support registry format conversion.
 
-To dump dat format file it requests administrator permission to execute `reg` command.
+Following operations request administrator permission to execute `reg` command:
+* write registry to actual system
 
 ## Supported Formats:
 * reg
