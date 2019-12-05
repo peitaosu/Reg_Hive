@@ -160,7 +160,7 @@ class Registry():
         temp_reg_file = uuid_str + ".reg"
         command = "regdat --dat2reg --in_dat {} --out_reg {}".format(dat_file_path, temp_reg_file)
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-        self._log("[REG] Output:{}".format(output))
+        self._log("[REGDAT] Output:{}".format(output))
         self.read_from_reg(temp_reg_file)
         os.remove(temp_reg_file)
 
@@ -287,7 +287,7 @@ class Registry():
         if platform.system() == "Windows":
             command = "regdat --reg2dat --in_reg {} --out_dat {}".format(temp_reg_file, dat_file_path)
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
-            self._log("[REG] Output:{}".format(output))
+            self._log("[REGDAT] Output:{}".format(output))
         else:
             print("Only Windows supports registry, your OS is {}".format(platform.system()))
         os.remove(temp_reg_file)
