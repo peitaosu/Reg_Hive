@@ -9,7 +9,7 @@ class Registry():
         self.reg_file_encode = "utf-16"
         self.regedit_ver = "Windows Registry Editor Version 5.00"
         self.log = "reg.log"
-        self.regdat = os.path.join(os.path.dirname(os.path.abspath(__file__)), "regdat.exe")
+        self.regdat_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "regdat.exe")
     
     def set_log(self, log_path):
         """set path to log file
@@ -158,7 +158,7 @@ class Registry():
         """
         uuid_str = str(uuid.uuid4())
         temp_reg_file = uuid_str + ".reg"
-        command = "regdat --dat2reg --in_dat {} --out_reg {}".format(dat_file_path, temp_reg_file)
+        command = "{} --dat2reg --in_dat {} --out_reg {}".format(self.regdat_path, dat_file_path, temp_reg_file)
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
         self._log("[REGDAT] Output:{}".format(output))
         self.read_from_reg(temp_reg_file)
@@ -271,21 +271,21 @@ class Registry():
             if self.reg_str[1:][iter].startswith("[") and not self.reg_str[1:][iter].startswith("[" + dump_path) and started != False:
                 ended = iter
                 break
-        if ended == False:
+        if not started:
+            print("[Error] {} PATH NOT FOUND.".format(dump_path))
+            return None
+        if not ended:
             matched_reg_str = self.reg_str[1:][started:]
         else:
             matched_reg_str = self.reg_str[1:][started:ended]
-        if started == False and started != 0:
-            print("[Error] {} PATH NOT FOUND.".format(dump_path))
-            return None
-        if redirect_path:
-            matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
+        matched_reg_str = [x.replace(dump_path, redirect_path) for x in matched_reg_str]
         redirected_reg_str.extend(matched_reg_str)
+        uuid_str = str(uuid.uuid4())
         temp_reg_file = uuid_str + ".reg"
         with open(temp_reg_file, "w") as reg_file:
             reg_file.write("\n".join(redirected_reg_str))
         if platform.system() == "Windows":
-            command = "regdat --reg2dat --in_reg {} --out_dat {}".format(temp_reg_file, dat_file_path)
+            command = "{} --reg2dat --in_reg {} --out_dat {}".format(self.regdat_path, temp_reg_file, dat_file_path)
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
             self._log("[REGDAT] Output:{}".format(output))
         else:
@@ -437,4 +437,4 @@ if __name__=="__main__":
             else:
                 reg.dump_to_dat(opt.out_dat, opt.hive_key, None)
         else:
-            print("Please specify --hive_key.")
+            reg.dump_to_dat(opt.out_dat, None)
