@@ -308,6 +308,19 @@ class Registry():
         self._log("[REG] Output:{}".format(output))
         os.remove(temp_reg_file)
 
+    def dump_from_registry(self, dat_file_path, dump_path):
+        """dump registry from actual system registry
+
+        args:
+            dump_path (str)
+        """
+        if platform.system() != "Windows":
+            print("Only Windows supports registry, your OS is {}".format(platform.system()))
+            return
+        command = "reg save {} {} /y".format(dump_path, dat_file_path)	
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)	
+        self._log("[REG] Output:{}".format(output))
+
     def update_value(self, reg_root, reg_key, reg_value, new_reg_data):
         """update date of registry value
 
