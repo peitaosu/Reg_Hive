@@ -139,7 +139,7 @@ class Registry():
                         }
                     )
             except Exception as e:
-                print("[Error] EXCEPTION ON {}: {}".format(reg_str, str(e)))
+                self._log("[Error] EXCEPTION ON {}: {}".format(reg_str, str(e)))
 
     def read_from_json(self, json_file_path):
         """read reg dict object from *.json file and update self.reg
@@ -209,7 +209,7 @@ class Registry():
                     else:
                         self.reg_str.append('"{}"="{}"'.format(value["Name"], value["Data"]))
                 except Exception as e:
-                    print("[Error] EXCEPTION ON {}: {}".format(value, str(e)))
+                    self._log("[Error] EXCEPTION ON {}: {}".format(value, str(e)))
             for key in sorted(parent_key["Keys"]):
                 _parse_key(parent_key["Keys"][key], parent_str + "\\" + key)
 
@@ -232,7 +232,7 @@ class Registry():
             else:
                 matched_reg_str = self.reg_str[1:][started:ended]
             if started == False and started != 0:
-                print("[Error] {} PATH NOT FOUND.".format(dump_path))
+                self._log("[Error] {} PATH NOT FOUND.".format(dump_path))
                 return None
             matched_reg_str = [self.regedit_ver] + matched_reg_str
         
@@ -259,7 +259,7 @@ class Registry():
         if len(self.reg_str) == 0:
             self.dump_to_reg()
         if dump_path is None:
-            print("[Error] {} CANNOT BE NONE.".format("dump_path"))
+            self._log("[Error] {} CANNOT BE NONE.".format("dump_path"))
             return None
         redirected_reg_str = []
         redirected_reg_str.append(self.regedit_ver)
@@ -272,7 +272,7 @@ class Registry():
                 ended = iter
                 break
         if not started:
-            print("[Error] {} PATH NOT FOUND.".format(dump_path))
+            self._log("[Error] {} PATH NOT FOUND.".format(dump_path))
             return None
         if not ended:
             matched_reg_str = self.reg_str[1:][started:]
@@ -289,7 +289,7 @@ class Registry():
             output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)
             self._log("[REGDAT] Output:{}".format(output))
         else:
-            print("Only Windows supports registry, your OS is {}".format(platform.system()))
+            self._log("Only Windows supports registry, your OS is {}".format(platform.system()))
         os.remove(temp_reg_file)
         return redirected_reg_str
     
@@ -297,7 +297,7 @@ class Registry():
         """write registry keys\values to actual system registry
         """
         if platform.system() != "Windows":
-            print("Only Windows supports registry, your OS is {}".format(platform.system()))
+            self._log("Only Windows supports registry, your OS is {}".format(platform.system()))
             return
         uuid_str = str(uuid.uuid4())
         temp_reg_file = uuid_str + ".reg"
@@ -315,7 +315,7 @@ class Registry():
             dump_path (str)
         """
         if platform.system() != "Windows":
-            print("Only Windows supports registry, your OS is {}".format(platform.system()))
+            self._log("Only Windows supports registry, your OS is {}".format(platform.system()))
             return
         command = "reg save {} {} /y".format(dump_path, dat_file_path)	
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, shell=True)	
